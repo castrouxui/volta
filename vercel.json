@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "framework": "vite",
+  "env": {
+    "VITE_API_URL": {
+      "description": "API URL for frontend",
+      "example": "https://volta-tawny.vercel.app"
+    }
+  },
+  "envPrefix": "VITE_"
+}

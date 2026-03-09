@@ -1,0 +1,21 @@
+{
+  "name": "volta",
+  "version": "0.1.0",
+  "description": "AI website builder - Transform ideas into websites",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run dev --prefix frontend & npm run dev --prefix backend",
+    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "format": "npm run format --prefix frontend && npm run format --prefix backend"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1"
+  }
+}
