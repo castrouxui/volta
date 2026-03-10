@@ -8,14 +8,47 @@ interface PreviewPanelProps {
   copySuccess: boolean;
   isPro: boolean;
   onExportReact: () => void;
+  language: 'es' | 'en';
 }
 
-const STAGES = [
+const STAGES_ES = [
+  { icon: '🔍', text: 'Analizando tu prompt...' },
+  { icon: '🎨', text: 'Diseñando el layout...' },
+  { icon: '⚡', text: 'Escribiendo HTML & CSS...' },
+  { icon: '✨', text: 'Agregando interacciones...' },
+];
+
+const STAGES_EN = [
   { icon: '🔍', text: 'Analyzing your prompt...' },
   { icon: '🎨', text: 'Designing the layout...' },
   { icon: '⚡', text: 'Writing HTML & CSS...' },
   { icon: '✨', text: 'Adding interactions...' },
 ];
+
+const UI_PREVIEW = {
+  es: {
+    stageOf: (i: number, total: number) => `Paso ${i} de ${total}`,
+    emptyTitle: 'Tu sitio web aparecerá acá',
+    emptySubtitle: 'Describí tu sitio o elegí una plantilla →',
+    preview: 'Vista previa',
+    code: 'Código',
+    copy: 'Copiar',
+    copied: 'Copiado!',
+    download: 'Descargar',
+    generating: 'Generando...',
+  },
+  en: {
+    stageOf: (i: number, total: number) => `Stage ${i} of ${total}`,
+    emptyTitle: 'Your website will appear here',
+    emptySubtitle: 'Describe your site or pick a template →',
+    preview: 'Preview',
+    code: 'Code',
+    copy: 'Copy',
+    copied: 'Copied!',
+    download: 'Download',
+    generating: 'Generating...',
+  },
+};
 
 const DEMO_LINES = [
   { color: 'text-volta-electric', text: '<!DOCTYPE html>' },
@@ -28,23 +61,25 @@ const DEMO_LINES = [
   { color: 'text-slate-400', text: '    </div>' },
 ];
 
-function GeneratingState() {
+function GeneratingState({ language }: { language: 'es' | 'en' }) {
   const [stageIndex, setStageIndex] = useState(0);
   const [visibleLines, setVisibleLines] = useState(0);
+  const STAGES = language === 'es' ? STAGES_ES : STAGES_EN;
+  const t = UI_PREVIEW[language];
 
   useEffect(() => {
-    const t = setInterval(() => setStageIndex((i) => Math.min(i + 1, STAGES.length - 1)), 3500);
-    return () => clearInterval(t);
-  }, []);
+    const timer = setInterval(() => setStageIndex((i) => Math.min(i + 1, STAGES.length - 1)), 3500);
+    return () => clearInterval(timer);
+  }, [STAGES.length]);
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => visibleLines < DEMO_LINES.length
         ? setVisibleLines((v) => v + 1)
         : setVisibleLines(0),
       visibleLines < DEMO_LINES.length ? 280 : 1800
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [visibleLines]);
 
   const stage = STAGES[stageIndex];
@@ -72,7 +107,7 @@ function GeneratingState() {
       <p className="text-sm font-semibold text-volta-midnight mb-1 text-center" key={stageIndex}>
         {stage.text}
       </p>
-      <p className="text-xs text-volta-slate-400 mb-6">Stage {stageIndex + 1} of {STAGES.length}</p>
+      <p className="text-xs text-volta-slate-400 mb-6">{t.stageOf(stageIndex + 1, STAGES.length)}</p>
 
       <div className="w-full max-w-xs bg-volta-midnight rounded-xl border border-white/10 overflow-hidden shadow-xl">
         <div className="flex items-center gap-1.5 px-3 py-2 bg-white/5 border-b border-white/5">
@@ -92,18 +127,19 @@ function GeneratingState() {
   );
 }
 
-function AnimatedEmptyState() {
+function AnimatedEmptyState({ language }: { language: 'es' | 'en' }) {
   const [visibleLines, setVisibleLines] = useState(0);
   const [loop, setLoop] = useState(false);
+  const t = UI_PREVIEW[language];
 
   useEffect(() => {
-    const t = setTimeout(
+    const timer = setTimeout(
       () => visibleLines < DEMO_LINES.length
         ? setVisibleLines((v) => v + 1)
         : (() => { setVisibleLines(0); setLoop((l) => !l); })(),
       visibleLines < DEMO_LINES.length ? 220 : 2200
     );
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [visibleLines, loop]);
 
   return (
@@ -128,8 +164,8 @@ function AnimatedEmptyState() {
         </div>
       </div>
 
-      <p className="text-volta-slate-500 text-sm font-medium text-center">Your website will appear here</p>
-      <p className="text-volta-slate-400 text-xs mt-1 text-center">Describe your site or pick a template →</p>
+      <p className="text-volta-slate-500 text-sm font-medium text-center">{t.emptyTitle}</p>
+      <p className="text-volta-slate-400 text-xs mt-1 text-center">{t.emptySubtitle}</p>
     </div>
   );
 }
@@ -137,9 +173,10 @@ function AnimatedEmptyState() {
 type Device = 'desktop' | 'mobile';
 type Tab = 'preview' | 'code';
 
-export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySuccess, isPro, onExportReact }: PreviewPanelProps) {
+export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySuccess, isPro, onExportReact, language }: PreviewPanelProps) {
   const [tab, setTab] = useState<Tab>('preview');
   const [device, setDevice] = useState<Device>('desktop');
+  const t = UI_PREVIEW[language];
 
   // Stable iframe key — only changes when html resets (new generation), not on every chunk
   const [iframeKey, setIframeKey] = useState(0);
@@ -167,7 +204,7 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
               tab === 'preview' ? 'text-volta-midnight border-volta-electric' : 'text-volta-slate-500 border-transparent hover:text-volta-midnight'
             }`}
           >
-            Preview
+            {t.preview}
           </button>
           <button
             onClick={() => setTab('code')}
@@ -175,7 +212,7 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
               tab === 'code' ? 'text-volta-midnight border-volta-electric' : 'text-volta-slate-500 border-transparent hover:text-volta-midnight'
             }`}
           >
-            Code
+            {t.code}
           </button>
         </div>
 
@@ -217,9 +254,9 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
               }`}
             >
               {copySuccess ? (
-                <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied!</>
+                <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>{t.copied}</>
               ) : (
-                <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy</>
+                <><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>{t.copy}</>
               )}
             </button>
             <button
@@ -227,7 +264,7 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
               className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-volta-slate-200 text-volta-slate-600 hover:border-volta-slate-300 hover:text-volta-midnight transition-colors"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              Download
+              {t.download}
             </button>
             <button
               onClick={onExportReact}
@@ -245,10 +282,10 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
       <div className="flex-1 relative" style={{ overflow: 'hidden' }}>
 
         {/* Generating: no html yet → show stage animation */}
-        {isGenerating && !html && <GeneratingState />}
+        {isGenerating && !html && <GeneratingState language={language} />}
 
         {/* Empty state */}
-        {isEmpty && <AnimatedEmptyState />}
+        {isEmpty && <AnimatedEmptyState language={language} />}
 
         {/* Preview — desktop */}
         {html && tab === 'preview' && device === 'desktop' && (
@@ -289,7 +326,7 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
         {isGenerating && html && tab === 'preview' && (
           <div className="absolute bottom-3 right-3 bg-volta-midnight/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-2 pointer-events-none">
             <span className="w-1.5 h-1.5 bg-volta-energy rounded-full animate-pulse" />
-            Generating...
+            {t.generating}
           </div>
         )}
       </div>

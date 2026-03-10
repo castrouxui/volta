@@ -172,7 +172,13 @@ export function GeneratorPanel({
                 : 'text-volta-slate-500 hover:text-volta-slate-700'
             }`}
           >
-            <span>🇦🇷</span>
+            {/* Argentina flag */}
+            <svg width="16" height="12" viewBox="0 0 16 12" className="rounded-sm overflow-hidden flex-shrink-0">
+              <rect width="16" height="4" fill="#74ACDF"/>
+              <rect y="4" width="16" height="4" fill="#fff"/>
+              <rect y="8" width="16" height="4" fill="#74ACDF"/>
+              <circle cx="8" cy="6" r="1.4" fill="#F6B40E"/>
+            </svg>
             <span>ES</span>
           </button>
           <button
@@ -183,7 +189,16 @@ export function GeneratorPanel({
                 : 'text-volta-slate-500 hover:text-volta-slate-700'
             }`}
           >
-            <span>🇺🇸</span>
+            {/* US flag */}
+            <svg width="16" height="12" viewBox="0 0 16 12" className="rounded-sm overflow-hidden flex-shrink-0">
+              <rect width="16" height="12" fill="#B22234"/>
+              <rect y="1.85" width="16" height="1.54" fill="#fff"/>
+              <rect y="3.7" width="16" height="1.54" fill="#B22234"/>
+              <rect y="5.54" width="16" height="1.54" fill="#fff"/>
+              <rect y="7.38" width="16" height="1.54" fill="#B22234"/>
+              <rect y="9.23" width="16" height="1.54" fill="#fff"/>
+              <rect width="6.5" height="6.46" fill="#3C3B6E"/>
+            </svg>
             <span>EN</span>
           </button>
         </div>

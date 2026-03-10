@@ -184,6 +184,7 @@ export function AppBuilder() {
       <Navbar
         onSignInClick={() => setShowAuth(true)}
         onPricingClick={() => setShowPricing(true)}
+        language={language}
       />
 
       {/* Connection error banner */}
@@ -238,6 +239,7 @@ export function AppBuilder() {
               copySuccess={copySuccess}
               isPro={auth.isPro}
               onExportReact={handleExportReact}
+              language={language}
             />
           </div>
         </div>

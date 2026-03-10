@@ -5,11 +5,42 @@ import { openBillingPortal } from '../lib/stripe';
 interface NavbarProps {
   onSignInClick: () => void;
   onPricingClick: () => void;
+  language: 'es' | 'en';
 }
 
-export function Navbar({ onSignInClick, onPricingClick }: NavbarProps) {
+const UI = {
+  es: {
+    pricing: 'Precios',
+    templates: 'Plantillas',
+    soon: 'Pronto',
+    signIn: 'Ingresar',
+    getStarted: 'Empezar gratis',
+    signedInAs: 'Ingresado como',
+    proPlan: 'Plan Pro',
+    freeToday: (n: number) => `Gratis — ${n}/5 hoy`,
+    manageSubscription: 'Administrar suscripción',
+    upgradePro: 'Mejorar a Pro ✨',
+    signOut: 'Salir',
+  },
+  en: {
+    pricing: 'Pricing',
+    templates: 'Templates',
+    soon: 'Soon',
+    signIn: 'Sign in',
+    getStarted: 'Get started free',
+    signedInAs: 'Signed in as',
+    proPlan: 'Pro plan',
+    freeToday: (n: number) => `Free — ${n}/5 today`,
+    manageSubscription: 'Manage subscription',
+    upgradePro: 'Upgrade to Pro ✨',
+    signOut: 'Sign out',
+  },
+};
+
+export function Navbar({ onSignInClick, onPricingClick, language }: NavbarProps) {
   const { user, profile, isPro, signOut, token } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = UI[language];
 
   const handlePortal = async () => {
     if (!token) return;
@@ -42,13 +73,16 @@ export function Navbar({ onSignInClick, onPricingClick }: NavbarProps) {
               onClick={onPricingClick}
               className="text-sm text-volta-slate-600 hover:text-volta-midnight transition-colors"
             >
-              Pricing
+              {t.pricing}
             </button>
             <a
               href="#templates"
-              className="text-sm text-volta-slate-600 hover:text-volta-midnight transition-colors"
+              className="flex items-center gap-1.5 text-sm text-volta-slate-600 hover:text-volta-midnight transition-colors"
             >
-              Templates
+              {t.templates}
+              <span className="text-[10px] font-bold bg-volta-slate-100 text-volta-slate-500 px-1.5 py-0.5 rounded-full leading-none">
+                {t.soon}
+              </span>
             </a>
 
             {user ? (
@@ -73,11 +107,11 @@ export function Navbar({ onSignInClick, onPricingClick }: NavbarProps) {
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-volta-slate-200 shadow-lg py-1 animate-slideUp">
                     <div className="px-4 py-2 border-b border-volta-slate-100">
-                      <p className="text-xs text-volta-slate-500">Signed in as</p>
+                      <p className="text-xs text-volta-slate-500">{t.signedInAs}</p>
                       <p className="text-sm font-medium text-volta-midnight truncate">{user.email}</p>
                       {profile && (
                         <p className="text-xs text-volta-slate-500 mt-0.5">
-                          {isPro ? 'Pro plan' : `Free — ${profile.generations_today}/5 today`}
+                          {isPro ? t.proPlan : t.freeToday(profile.generations_today)}
                         </p>
                       )}
                     </div>
@@ -86,21 +120,21 @@ export function Navbar({ onSignInClick, onPricingClick }: NavbarProps) {
                         onClick={handlePortal}
                         className="w-full text-left px-4 py-2 text-sm text-volta-slate-700 hover:bg-volta-slate-50 transition-colors"
                       >
-                        Manage subscription
+                        {t.manageSubscription}
                       </button>
                     ) : (
                       <button
                         onClick={() => { setMenuOpen(false); onPricingClick(); }}
                         className="w-full text-left px-4 py-2 text-sm text-volta-electric font-medium hover:bg-volta-slate-50 transition-colors"
                       >
-                        Upgrade to Pro ✨
+                        {t.upgradePro}
                       </button>
                     )}
                     <button
                       onClick={() => { setMenuOpen(false); signOut(); }}
                       className="w-full text-left px-4 py-2 text-sm text-volta-slate-600 hover:bg-volta-slate-50 transition-colors"
                     >
-                      Sign out
+                      {t.signOut}
                     </button>
                   </div>
                 )}
@@ -111,13 +145,13 @@ export function Navbar({ onSignInClick, onPricingClick }: NavbarProps) {
                   onClick={onSignInClick}
                   className="text-sm font-medium text-volta-midnight hover:text-volta-electric transition-colors"
                 >
-                  Sign in
+                  {t.signIn}
                 </button>
                 <button
                   onClick={onSignInClick}
                   className="text-sm font-medium bg-volta-electric text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
                 >
-                  Get started free
+                  {t.getStarted}
                 </button>
               </div>
             )}
