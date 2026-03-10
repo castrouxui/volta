@@ -4,15 +4,9 @@
   "installCommand": "npm install",
   "framework": null,
   "functions": {
-    "api/index.ts": {
+    "api/[...path].ts": {
       "maxDuration": 60,
       "includeFiles": "backend/src/**"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    }
-  ]
+  }
 }
