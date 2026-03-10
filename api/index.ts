@@ -12,7 +12,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 // CORS
 app.use(
   cors({
-    origin: [FRONTEND_URL, 'https://volta-ai.vercel.app', 'http://localhost:5173', 'http://localhost:4173'],
+    origin: [FRONTEND_URL, 'https://volta-tawny.vercel.app', 'http://localhost:5173', 'http://localhost:4173'],
     credentials: true,
   })
 );
