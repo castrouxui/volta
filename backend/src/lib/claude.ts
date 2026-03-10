@@ -17,6 +17,8 @@ When given a description, generate a COMPLETE, self-contained HTML file with:
 - Proper semantic HTML5 structure
 - No placeholder images — use CSS gradients, SVG patterns, or geometric shapes as visual elements
 - All JavaScript inline (no external dependencies except Tailwind CDN)
+- Navigation links MUST use anchor IDs that match real section IDs (e.g. href="#features" links to <section id="features">). NEVER use href="#" alone or href="javascript:void(0)"
+- Every section referenced in the nav must have a matching id attribute
 
 OUTPUT RULES:
 - Output ONLY the raw HTML — no markdown, no code blocks, no explanations
@@ -29,6 +31,7 @@ interface StreamOptions {
   logoBase64?: string;
   logoMimeType?: string;
   styleSuffix?: string;
+  language?: string;
 }
 
 export async function* streamWebsite(
@@ -36,7 +39,13 @@ export async function* streamWebsite(
   conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [],
   options: StreamOptions = {}
 ): AsyncGenerator<string> {
-  const fullPrompt = options.styleSuffix ? `${prompt}\n\n${options.styleSuffix}` : prompt;
+  const languageInstruction = options.language === 'es'
+    ? '\n\nLANGUAGE: Generate ALL website text content (headings, body copy, buttons, labels, nav links, descriptions, testimonials, etc.) in Spanish (Latin American). Use natural, modern Spanish appropriate for professional websites.'
+    : '';
+
+  const fullPrompt = options.styleSuffix
+    ? `${prompt}\n\n${options.styleSuffix}${languageInstruction}`
+    : `${prompt}${languageInstruction}`;
 
   // Build user message — with or without logo image
   type UserContent = Array<Anthropic.ImageBlockParam | Anthropic.TextBlockParam>;

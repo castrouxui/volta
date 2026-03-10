@@ -11,9 +11,19 @@ interface ChatRefinementProps {
   isGenerating: boolean;
   isPro: boolean;
   onUpgradeClick: () => void;
+  language: 'es' | 'en';
 }
 
-const QUICK_PROMPTS = [
+const QUICK_PROMPTS_ES = [
+  'Hacer el esquema de colores más oscuro',
+  'Agregar una sección de precios',
+  'Cambiar la tipografía a serif',
+  'Hacerlo más minimalista',
+  'Agregar animaciones',
+  'Mejorar el layout para móvil',
+];
+
+const QUICK_PROMPTS_EN = [
   'Make the color scheme darker',
   'Add a pricing section',
   'Change the font to serif',
@@ -22,10 +32,30 @@ const QUICK_PROMPTS = [
   'Improve mobile layout',
 ];
 
-export function ChatRefinement({ onRefine, isGenerating, isPro, onUpgradeClick }: ChatRefinementProps) {
+const UI = {
+  es: {
+    title: 'Refinamiento con chat',
+    subtitle: 'Iterá sobre tu sitio con lenguaje natural — función Pro',
+    upgrade: 'Mejorar a Pro →',
+    header: 'Refinar con chat',
+    placeholder: 'ej. Hacer la sección hero a pantalla completa...',
+  },
+  en: {
+    title: 'Chat Refinement',
+    subtitle: 'Iterate on your website with natural language — Pro feature',
+    upgrade: 'Upgrade to Pro →',
+    header: 'Refine with chat',
+    placeholder: 'e.g. Make the hero section full-screen...',
+  },
+};
+
+export function ChatRefinement({ onRefine, isGenerating, isPro, onUpgradeClick, language }: ChatRefinementProps) {
   const [instruction, setInstruction] = useState('');
   const [history, setHistory] = useState<Message[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const t = UI[language];
+  const QUICK_PROMPTS = language === 'es' ? QUICK_PROMPTS_ES : QUICK_PROMPTS_EN;
 
   const handleSubmit = () => {
     if (!instruction.trim() || isGenerating || !isPro) return;
@@ -53,15 +83,13 @@ export function ChatRefinement({ onRefine, isGenerating, isPro, onUpgradeClick }
             </svg>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-volta-midnight">Chat Refinement</p>
-            <p className="text-xs text-volta-slate-500 mt-0.5">
-              Iterate on your website with natural language — Pro feature
-            </p>
+            <p className="text-sm font-semibold text-volta-midnight">{t.title}</p>
+            <p className="text-xs text-volta-slate-500 mt-0.5">{t.subtitle}</p>
             <button
               onClick={onUpgradeClick}
               className="mt-2 text-xs font-semibold text-volta-electric hover:text-volta-spark transition-colors"
             >
-              Upgrade to Pro →
+              {t.upgrade}
             </button>
           </div>
         </div>
@@ -77,7 +105,7 @@ export function ChatRefinement({ onRefine, isGenerating, isPro, onUpgradeClick }
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <p className="text-xs font-semibold text-volta-slate-700">Refine with chat</p>
+        <p className="text-xs font-semibold text-volta-slate-700">{t.header}</p>
       </div>
 
       {/* History */}
@@ -120,7 +148,7 @@ export function ChatRefinement({ onRefine, isGenerating, isPro, onUpgradeClick }
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="e.g. Make the hero section full-screen..."
+          placeholder={t.placeholder}
           disabled={isGenerating}
           className="flex-1 text-sm border border-volta-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-volta-electric/30 focus:border-volta-electric transition-all disabled:opacity-50"
         />

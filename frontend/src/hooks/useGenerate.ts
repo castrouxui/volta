@@ -7,6 +7,7 @@ interface GenerateOptions {
   logoBase64?: string;
   logoMimeType?: string;
   styleSuffix?: string;
+  language?: string;
 }
 
 interface UsageInfo {
@@ -58,6 +59,7 @@ export function useGenerate() {
           logoBase64: options.logoBase64,
           logoMimeType: options.logoMimeType,
           styleSuffix: options.styleSuffix,
+          language: options.language,
         }),
         signal: abortRef.current.signal,
       });

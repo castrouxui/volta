@@ -35,6 +35,7 @@ export function AppBuilder() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [generationsToday, setGenerationsToday] = useState(0);
+  const [language, setLanguage] = useState<'es' | 'en'>('es');
 
   // Sync generations count from profile
   useEffect(() => {
@@ -84,11 +85,12 @@ export function AppBuilder() {
       logoBase64: styleOptions.logoBase64 || undefined,
       logoMimeType: styleOptions.logoMimeType || undefined,
       styleSuffix: buildStyleSuffix(styleOptions),
+      language,
     });
     if (result?.usage) {
       setGenerationsToday(result.usage.generationsToday);
     }
-  }, [generate, auth.token, sessionId]);
+  }, [generate, auth.token, sessionId, language]);
 
   const handleEnhance = useCallback(async (prompt: string): Promise<string | null> => {
     try {
@@ -210,6 +212,8 @@ export function AppBuilder() {
               generationsToday={generationsToday}
               isPro={auth.isPro}
               onUpgradeClick={() => setShowPricing(true)}
+              language={language}
+              onLanguageChange={setLanguage}
             />
 
             {/* Chat refinement — only show when there's a result */}
@@ -219,6 +223,7 @@ export function AppBuilder() {
                 isGenerating={isGenerating}
                 isPro={auth.isPro}
                 onUpgradeClick={() => setShowPricing(true)}
+                language={language}
               />
             )}
           </div>
