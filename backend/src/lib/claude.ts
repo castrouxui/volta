@@ -47,12 +47,15 @@ TECHNICAL REQUIREMENTS:
 - All JS inline, no external deps except CDNs
 - Semantic HTML5
 
-COMPLETENESS — every generation is a FULL landing page:
+COMPLETENESS AND FUNCTIONALITY — every generation is a FULL, working landing page:
 - MANDATORY sections: sticky nav + hero + at least 4 body sections (features, social proof, testimonials, pricing, FAQ, showcase, about, etc.) + footer with multiple columns
+- DO NOT CUT OFF THE CODE. Generate the entire file from start to finish. Never use placeholders like "<!-- rest of the code -->".
+- Navigation links MUST be functional. Use anchor IDs correctly (e.g., href="#features" matches id="features" in a section). The sticky nav must allow scrolling to sections.
+- Mobile menu MUST WORK: include inline JavaScript to toggle the mobile menu visibility when the hamburger icon is clicked.
 - Never stop generating after the hero — that is only the beginning. The hero is section 1 of 6+.
 - Every section must be fully coded with real copy, real layout, real styles — no "section goes here" placeholders
 - Footer must have 3-4 columns: brand/description, navigation links, contact info, social icons
-- Aim for 600-1000+ lines of HTML to produce a rich, complete, impressive page
+- Aim for 800-1500 lines of HTML to produce a rich, complete, impressive page
 
 OUTPUT RULES:
 - Output ONLY raw HTML — no markdown, no code blocks, no explanations

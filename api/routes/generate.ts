@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { AuthRequest, optionalAuth, requireAuth } from '../middleware/auth';
 import { checkGenerationLimit } from '../middleware/rateLimit';
 import { streamWebsite, refineWebsite, enhancePrompt } from '../lib/claude';
+import { generateSiteImage } from '../lib/gemini';
 import { saveGeneration, getUserProfile } from '../lib/supabase';
 
 const router = Router();
@@ -14,12 +15,13 @@ function sendSSE(res: Response, data: Record<string, unknown>): void {
 
 // POST /api/generate
 router.post('/', optionalAuth, checkGenerationLimit, async (req: AuthRequest, res: Response) => {
-  const { prompt, sessionId, logoBase64, logoMimeType, styleSuffix } = req.body as {
+  const { prompt, sessionId, logoBase64, logoMimeType, styleSuffix, language } = req.body as {
     prompt?: string;
     sessionId?: string;
     logoBase64?: string;
     logoMimeType?: string;
     styleSuffix?: string;
+    language?: string;
   };
 
   if (!prompt?.trim()) {
@@ -38,7 +40,10 @@ router.post('/', optionalAuth, checkGenerationLimit, async (req: AuthRequest, re
   try {
     sendSSE(res, { type: 'start' });
 
-    for await (const chunk of streamWebsite(prompt, [], { logoBase64, logoMimeType, styleSuffix })) {
+    // Generate hero image with Gemini if API key is configured
+    const heroImage = await generateSiteImage(prompt);
+
+    for await (const chunk of streamWebsite(prompt, [], { logoBase64, logoMimeType, styleSuffix, language, heroImage: heroImage ?? undefined })) {
       fullHtml += chunk;
       sendSSE(res, { type: 'chunk', text: chunk });
     }
