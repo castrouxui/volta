@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import generateRouter from '../backend/src/routes/generate';
 import authRouter from '../backend/src/routes/auth';
@@ -17,7 +17,7 @@ app.use(
   })
 );
 
-// Stripe/LemonSqueezy webhook needs raw body — must be before express.json()
+// Webhook needs raw body — must be before express.json()
 app.use('/api/billing/webhook', express.raw({ type: 'application/json' }));
 
 // Body parsing
@@ -30,8 +30,9 @@ app.use('/api/billing', billingRouter);
 app.use('/api/export', exportRouter);
 
 // Health check
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Vercel serverless handler
 export default app;
