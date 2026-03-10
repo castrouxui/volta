@@ -1,10 +1,10 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import generateRouter from '../backend/src/routes/generate';
-import authRouter from '../backend/src/routes/auth';
-import billingRouter from '../backend/src/routes/billing';
-import exportRouter from '../backend/src/routes/export';
+import generateRouter from './routes/generate';
+import authRouter from './routes/auth';
+import billingRouter from './routes/billing';
+import exportRouter from './routes/export';
 
 const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -34,5 +34,4 @@ app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Vercel serverless handler
 export default app;
