@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { AuthRequest, optionalAuth, requireAuth } from '../middleware/auth';
 import { checkGenerationLimit } from '../middleware/rateLimit';
 import { streamWebsite, refineWebsite, enhancePrompt } from '../lib/claude';
+import { generateSiteImage } from '../lib/gemini';
 import { saveGeneration, getUserProfile } from '../lib/supabase';
 
 const router = Router();
@@ -39,7 +40,10 @@ router.post('/', optionalAuth, checkGenerationLimit, async (req: AuthRequest, re
   try {
     sendSSE(res, { type: 'start' });
 
-    for await (const chunk of streamWebsite(prompt, [], { logoBase64, logoMimeType, styleSuffix, language })) {
+    // Generate hero image with Gemini if API key is configured
+    const heroImage = await generateSiteImage(prompt);
+
+    for await (const chunk of streamWebsite(prompt, [], { logoBase64, logoMimeType, styleSuffix, language, heroImage: heroImage ?? undefined })) {
       fullHtml += chunk;
       sendSSE(res, { type: 'chunk', text: chunk });
     }

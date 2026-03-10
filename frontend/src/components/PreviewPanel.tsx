@@ -281,18 +281,15 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
       {/* Content area */}
       <div className="flex-1 relative" style={{ overflow: 'hidden' }}>
 
-        {/* Generating: no html yet → show stage animation */}
-        {isGenerating && !html && <GeneratingState language={language} />}
-
         {/* Empty state */}
         {isEmpty && <AnimatedEmptyState language={language} />}
 
-        {/* Preview — desktop */}
+        {/* Preview — desktop (rendered behind overlay while generating) */}
         {html && tab === 'preview' && device === 'desktop' && (
           <iframe
             key={iframeKey}
             srcDoc={html}
-            className="w-full h-full border-0"
+            className={`w-full h-full border-0 transition-opacity duration-700 ${isGenerating ? 'opacity-0' : 'opacity-100'}`}
             title="Generated website preview"
             sandbox="allow-scripts allow-same-origin"
           />
@@ -300,7 +297,7 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
 
         {/* Preview — mobile phone frame */}
         {html && tab === 'preview' && device === 'mobile' && (
-          <div className="flex items-center justify-center h-full bg-volta-slate-100 py-4 overflow-auto">
+          <div className={`flex items-center justify-center h-full bg-volta-slate-100 py-4 overflow-auto transition-opacity duration-700 ${isGenerating ? 'opacity-0' : 'opacity-100'}`}>
             <div className="phone-frame shrink-0">
               <div className="phone-statusbar" />
               <iframe
@@ -315,18 +312,17 @@ export function PreviewPanel({ html, isGenerating, onDownload, onCopy, copySucce
           </div>
         )}
 
-        {/* Code tab */}
+        {/* Code tab — shows live HTML while streaming */}
         {html && tab === 'code' && (
           <pre className="p-4 text-xs font-mono h-full leading-relaxed animate-fadeIn" style={{ overflow: 'auto' }}>
             <code className="text-volta-slate-700 whitespace-pre-wrap break-all">{html}</code>
           </pre>
         )}
 
-        {/* Streaming badge — shown while generating over live preview */}
-        {isGenerating && html && tab === 'preview' && (
-          <div className="absolute bottom-3 right-3 bg-volta-midnight/80 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-2 pointer-events-none">
-            <span className="w-1.5 h-1.5 bg-volta-energy rounded-full animate-pulse" />
-            {t.generating}
+        {/* Generating overlay — covers preview for the full duration of streaming */}
+        {isGenerating && tab === 'preview' && (
+          <div className="absolute inset-0 bg-white z-10">
+            <GeneratingState language={language} />
           </div>
         )}
       </div>

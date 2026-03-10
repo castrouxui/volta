@@ -5,7 +5,7 @@
 ## Stack
 
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS → Vercel
-- **Backend**: Node.js + Express + TypeScript → Railway
+- **Backend**: Node.js + Express + TypeScript → Vercel Serverless
 - **Auth + DB**: Supabase (PostgreSQL + Auth)
 - **Payments**: Stripe (subscription)
 - **AI**: Claude API (claude-sonnet-4-6) with streaming
@@ -45,6 +45,7 @@ Run `supabase/schema.sql` in your Supabase SQL Editor.
 | Variable | Description |
 |----------|-------------|
 | `ANTHROPIC_API_KEY` | Claude API key |
+| `GEMINI_API_KEY` | Google Gemini API key (for hero image generation) |
 | `SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (not anon!) |
 | `STRIPE_SECRET_KEY` | Stripe secret key |
@@ -95,15 +96,11 @@ npm run build
 vercel deploy --prod
 ```
 
-Set env vars in Vercel dashboard. Update `vercel.json` with your Railway backend URL.
-
-### Backend → Railway
-
-Connect your GitHub repo to Railway. Set all backend env vars. Railway auto-detects the `railway.json` config.
+Set env vars in Vercel dashboard. Frontend and backend both deploy automatically from the same repo via `vercel.json`.
 
 ### Stripe Webhooks
 
-Point Stripe webhook to: `https://your-railway-url/api/billing/webhook`
+Point Stripe webhook to: `https://your-vercel-url/api/billing/webhook`
 
 Events to listen for:
 - `checkout.session.completed`

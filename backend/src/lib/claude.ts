@@ -39,11 +39,20 @@ LAYOUT VARIETY — never repeat the same structure:
 TECHNICAL REQUIREMENTS:
 - Tailwind CSS via CDN + custom CSS in <style> tag for effects Tailwind can't do
 - Google Fonts — choose a pairing that fits the brand (e.g. Playfair Display + DM Sans, Syne + Inter, Cabinet Grotesk + Instrument Serif)
-- Fully responsive: 375px mobile, 768px tablet, 1440px desktop. Use sm:, md:, lg: prefixes.
-- Hamburger menu on mobile with JS toggle
+- Fully responsive across ALL breakpoints: 375px mobile, 640px small tablet, 768px tablet, 1024px laptop, 1440px desktop. Use sm:, md:, lg:, xl: prefixes aggressively.
+- Every grid must collapse to 1 column on mobile. Every font size must scale down on mobile. Every section padding must be smaller on mobile.
+- Hamburger menu on mobile with JS toggle — the full nav must be hidden on mobile and revealed by the hamburger
 - Navigation links use anchor IDs matching real section IDs (href="#features" → <section id="features">). NEVER href="#" or href="javascript:void(0)"
+- Touch targets minimum 44px height on mobile. No horizontal overflow. All images responsive with max-w-full.
 - All JS inline, no external deps except CDNs
 - Semantic HTML5
+
+COMPLETENESS — every generation is a FULL landing page:
+- MANDATORY sections: sticky nav + hero + at least 4 body sections (features, social proof, testimonials, pricing, FAQ, showcase, about, etc.) + footer with multiple columns
+- Never stop generating after the hero — that is only the beginning. The hero is section 1 of 6+.
+- Every section must be fully coded with real copy, real layout, real styles — no "section goes here" placeholders
+- Footer must have 3-4 columns: brand/description, navigation links, contact info, social icons
+- Aim for 600-1000+ lines of HTML to produce a rich, complete, impressive page
 
 OUTPUT RULES:
 - Output ONLY raw HTML — no markdown, no code blocks, no explanations
@@ -56,6 +65,7 @@ interface StreamOptions {
   logoMimeType?: string;
   styleSuffix?: string;
   language?: string;
+  heroImage?: { base64: string; mimeType: string };
 }
 
 export async function* streamWebsite(
@@ -71,24 +81,66 @@ export async function* streamWebsite(
     ? `${prompt}\n\n${options.styleSuffix}${languageInstruction}`
     : `${prompt}${languageInstruction}`;
 
-  // Build user message — with or without logo image
+  // Build user message — with logo and/or generated hero image
   type UserContent = Array<Anthropic.ImageBlockParam | Anthropic.TextBlockParam>;
 
   let userContent: string | UserContent;
 
-  if (options.logoBase64 && options.logoMimeType) {
+  const hasBoth = options.logoBase64 && options.logoMimeType && options.heroImage;
+  const hasLogoOnly = options.logoBase64 && options.logoMimeType && !options.heroImage;
+  const hasHeroOnly = options.heroImage && !(options.logoBase64 && options.logoMimeType);
+
+  if (hasBoth) {
     userContent = [
       {
         type: 'image',
         source: {
           type: 'base64',
           media_type: options.logoMimeType as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
-          data: options.logoBase64,
+          data: options.logoBase64!,
+        },
+      },
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: options.heroImage!.mimeType as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
+          data: options.heroImage!.base64,
+        },
+      },
+      {
+        type: 'text',
+        text: `${fullPrompt}\n\nFirst image: the brand logo — embed it as a base64 data URL and use its colors/style throughout the design.\nSecond image: a generated hero image — use it as the main hero background or featured image by embedding it as a base64 data URI in the HTML.`,
+      },
+    ];
+  } else if (hasLogoOnly) {
+    userContent = [
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: options.logoMimeType as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
+          data: options.logoBase64!,
         },
       },
       {
         type: 'text',
         text: `${fullPrompt}\n\nThe image above is the logo. Embed it as a base64 data URL in the HTML and use its colors/style to inform the overall design.`,
+      },
+    ];
+  } else if (hasHeroOnly) {
+    userContent = [
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: options.heroImage!.mimeType as 'image/png' | 'image/jpeg' | 'image/gif' | 'image/webp',
+          data: options.heroImage!.base64,
+        },
+      },
+      {
+        type: 'text',
+        text: `${fullPrompt}\n\nThe image above was generated as a hero image for this website. Use it as the main hero background or featured image by embedding it as a base64 data URI: data:${options.heroImage!.mimeType};base64,<the base64 data>.`,
       },
     ];
   } else {
@@ -102,7 +154,7 @@ export async function* streamWebsite(
 
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-6',
-    max_tokens: 12000,
+    max_tokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [
       ...historyMessages,

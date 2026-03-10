@@ -44,7 +44,7 @@ const CHAR_LIMIT = 500;
 const UI = {
   es: {
     heading: ['Transformá ideas', 'en sitios web'],
-    subheading: 'Describí tu sitio — Claude lo construye en segundos',
+    subheading: 'Describí tu sitio — listo en segundos',
     quickTemplates: 'Plantillas rápidas',
     customizeStyle: 'Personalizar estilo →',
     hideStyle: 'Ocultar opciones de estilo',
@@ -62,7 +62,7 @@ const UI = {
   },
   en: {
     heading: ['Transform ideas', 'into websites'],
-    subheading: 'Describe your site — Claude builds it in seconds',
+    subheading: 'Describe your site — ready in seconds',
     quickTemplates: 'Quick templates',
     customizeStyle: 'Customize style →',
     hideStyle: 'Hide style options',
@@ -290,7 +290,7 @@ export function GeneratorPanel({
         </button>
 
         {showStyle && (
-          <StylePanel options={styleOptions} onChange={setStyleOptions} />
+          <StylePanel options={styleOptions} onChange={setStyleOptions} language={language} />
         )}
 
         {/* Generate button */}
