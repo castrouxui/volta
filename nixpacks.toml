@@ -1,5 +1,0 @@
-[providers]
-node = "20"
-
-[build]
-dir = "backend"
